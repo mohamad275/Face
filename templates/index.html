@@ -1,1 +1,119 @@
 
+<!doctype html>
+<html>
+  <head>
+      <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-recognition"></script>
+
+    <title>Face Recognition Login</title>
+    <style>
+      body {
+        background-color: #f9f9f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      #loginForm {
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        max-width: 500px;
+        margin: 50px auto;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 32px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 30px;
+      }
+
+      label {
+        display: block;
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        color: #666;
+      }
+
+      video {
+        display: block;
+        margin-bottom: 20px;
+        border: 2px solid #eee;
+        border-radius: 8px;
+      }
+
+      button {
+        background: #247cff;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 30px;
+        transition: all 0.3s ease-in-out;
+      }
+
+      button:hover {
+        background: #247cff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      a {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 16px;
+        color: #999;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #333;
+      }
+      @media (max-width: 767px) {
+        video {
+         width: 100%;
+         height: auto;
+      }
+    }
+
+    </style>
+  </head>
+  <body>
+    <form id="loginForm" action="{{ url_for('login') }}" method="POST">
+      <h1>Face ID Login</h1>
+      <label for="video_stream">Scan your face to login:</label>
+      <video id="video" width="320" height="240" autoplay playsinline muted poster="https://via.placeholder.com/320x240"></video>
+
+      <input type="hidden" name="video_stream" id="video_stream" value="">
+      <button type="submit">Login</button>
+    </form>
+    <a href="{{ url_for('signup') }}">Don't have an account? Signup here.</a>
+
+    <script>
+      const video = document.getElementById('video');
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const loginForm = document.getElementById('loginForm');
+      const videostreamInput = document.getElementById('video_stream');
+
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => video.srcObject = stream)
+        .catch(err => console.error(err));
+
+      loginForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // prevent form submission
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        videostreamInput.value = canvas.toDataURL();
+        loginForm.submit(); // submit the form after taking the snapshot
+      });
+    </script>
+  </body>
+</html>
